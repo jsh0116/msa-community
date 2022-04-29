@@ -18,3 +18,9 @@ Port: 8083
 
 # Entity&Value-Object
 ![Entity Value-Object](https://user-images.githubusercontent.com/53042885/164648463-b47d5977-7357-4aad-b090-4bf4681bdd97.png)
+
+
+#### Kafka 실습 시나리오
+게시물 저장 -> 게시물 저장 이벤트 전달 (Producer) -> Kafka -> 저장 정보를 받아 게시물 리스트 출력 (consumer)
+
+![image](https://user-images.githubusercontent.com/62865808/165917418-86939f6e-97b9-4a06-b18d-dfe3fd283707.png)
