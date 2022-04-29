@@ -12,14 +12,18 @@ import java.util.Objects;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final KafkaProducerService kafkaProducerService;
 
-    public BoardServiceImpl(BoardRepository boardRepository) {
+    public BoardServiceImpl(BoardRepository boardRepository, KafkaProducerService kafkaProducerService) {
         this.boardRepository = boardRepository;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     //게시글 저장
     @Override
     public Mono<Board> saveBoard(Board board) {
+        // producer 역할 수행
+        kafkaProducerService.sendMessage("Kafka Message: save BoardId = " + board.getId());
         return this.boardRepository.save(board);
     }
 

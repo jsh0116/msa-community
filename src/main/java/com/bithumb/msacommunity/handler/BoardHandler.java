@@ -9,6 +9,7 @@ import com.bithumb.msacommunity.repository.BoardRepository;
 import com.bithumb.msacommunity.domain.Reply;
 import com.bithumb.msacommunity.service.BoardAggregatorService;
 import com.bithumb.msacommunity.service.BoardService;
+import com.bithumb.msacommunity.service.KafkaConsumerService;
 import lombok.RequiredArgsConstructor;
 import org.h2.message.Trace;
 import org.h2.tools.Server;
@@ -40,6 +41,7 @@ public class BoardHandler {
     private final BoardAggregateRepository boardAggregateRepository;
     private final BoardAggregatorService boardAggregatorService;
     private final BoardRepository boardRepository;
+    private final KafkaConsumerService kafkaConsumerService;
 
     /**
      * 게시글 목록을 가져오는 메소드
@@ -52,7 +54,10 @@ public class BoardHandler {
         Integer pageSize = request.queryParam("page-size").isPresent() ? Integer.parseInt(request.queryParam("page-size").get()) : 10;
         Mono<ServerResponse> notFound = ServerResponse.notFound().build();
         return Mono.just(boardRepository.findAllByPage(PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "insertdt"))))
-                .flatMap(board -> ServerResponse.ok().contentType(APPLICATION_JSON).body(board, Board.class).switchIfEmpty(notFound));
+                .flatMap(board -> {
+                    kafkaConsumerService.consume("get board");
+                    return ServerResponse.ok().contentType(APPLICATION_JSON).body(board, Board.class).switchIfEmpty(notFound);
+                });
     }
 
     /**
